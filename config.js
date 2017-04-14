@@ -1,6 +1,6 @@
 module.exports = {
   channel: 'monstercat',
-  defaultVolume: 1,
+  defaultVolume: 25,
   enableChat: true,
   enableTracklist: true,
 

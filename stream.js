@@ -15,6 +15,7 @@ const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 })
+const path = require('path')
 var v, speaker, ffmpeg, now, volume
 
 const write = (errored) => {
@@ -29,6 +30,25 @@ const setVolume = (vol) => {
 setVolume(config.defaultVolume)
 
 process.title = config.channel === 'monstercat' ? 'Monstercat FM' : config.channel
+
+const fileExists = (path) => {
+  try {
+    return require('fs').statSync(path).isFile()
+  } catch (e) { return false }
+}
+
+const createProcess = (exe, args, opts) => {
+  var binaries = [exe, exe + '.exe']
+  for (var name of binaries) {
+    for (var dir of ['.'].concat((process.env.PATH || '').split(path.delimiter))) {
+      var binary = dir + path.sep + name
+      if (!fileExists(binary)) continue
+
+      return spawn(name, args, opts)
+    }
+  }
+  throw new Error('NO FFMPEG FOUND')
+}
 
 const play = () => {
   if (ffmpeg) {
@@ -55,7 +75,7 @@ const play = () => {
               speaker = new Speaker(speakerConfig)
               v = new Volume()
               v.setVolume(volume)
-              ffmpeg = spawn('ffmpeg', [
+              ffmpeg = createProcess('ffmpeg', [
                 '-i', item.get('uri'),
                 '-f', 's16le',
                 '-ar', '48000',
