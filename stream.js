@@ -122,6 +122,7 @@ if (config.channel === 'monstercat' && config.enableTracklist) {
   var socket = io('https://prism.theak.io')
   socket.on('connect', function () {
     // console.log("Connected!");
+    socket.emit('origin', 'AudioTwitch')
     socket.emit('last-track')
   })
   socket.on('disconnect', function () {
