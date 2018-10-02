@@ -2,7 +2,7 @@
 AudioTwitch is a light Node.JS application that lets you stream twitch channels with audio only. This saves you bandwidth, CPU and RAM.
 
 ## Features
-AudioTwitch has
+AudioTwitch includes
 * Chat functionality
 * Configuration
 * Audio only stream
