@@ -1,20 +1,29 @@
 # AudioTwitch
-AudioTwitch is a light Node.JS application that lets you stream twitch channels with audio only. This saves you bandwidth, CPU and RAM.
+AudioTwitch is a light Node.JS application that lets you stream twitch channels with audio only from your terminal. This saves you bandwidth, CPU and RAM.
 
 ## Features
 AudioTwitch includes
 * Chat functionality
 * Configuration
-* Audio only stream
+* Audio only streaming
+* Video streaming
 * Volume switching
 
 (You can't see the emotes though, rip Kappa)
 
 ## Commands
 AudioTwitch has a few commands:
-* `/kill` or `/stop` - Stops the application.
-* `/restart` - Restarts the stream if it ended for some reason.
-* `/volume [%]` - Sets the volume (has a slight delay).
+* `/kill`, `/quit` or `/stop` - Stops the application.
+* `/restart` - Restarts the stream and chat if there was a problem for some reason.
+* `/reset` - Resets the player completely in case the stream url has changed.
+* `/volume [%]`, `/vol [%]`, `/v [%]` - Sets the volume (has a slight delay). Displays current volume if no argument is provided.
+* `/togglechat` - Toggles chat on or off if you prefer not having twitch chat bothering you.
+* `/login`, `/logout` - For logging in and out of twitch chat so you can talk.
+* `/channel [channel]` - Switch twitch channels.
+* `/formats` - Displays what formats are available.
+* `/format [format]` - Switches the stream to the selected format.
+* Twitch chat commands also work, check `/twitchhelp`
+* To see these commands in the application, use `/help`
 
 ## Installation
 1. Download the repository and extract somewhere

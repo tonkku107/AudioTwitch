@@ -164,7 +164,17 @@ console.rl.on('line', async line => {
         chat.sendMessage(line);
         break;
       case '/help':
-        console.log('INFO', 'Soon');
+        console.log('INFO', `AudioTwitch has a few commands:
+* /kill, /quit or /stop - Stops the application.
+* /restart - Restarts the stream and chat if there was a problem for some reason.
+* /reset - Resets the player completely in case the stream url has changed.
+* /volume [%], /vol [%], /v [%] - Sets the volume (has a slight delay). Displays current volume if no argument is provided.
+* /togglechat - Toggles chat on or off if you prefer not having twitch chat bothering you.
+* /login, /logout - For logging in and out of twitch chat so you can talk.
+* /channel [channel] - Switch twitch channels.
+* /formats - Displays what formats are available.
+* /format [format] - Switches the stream to the selected format.
+* Twitch chat commands also work, check /twitchhelp`);
         break;
       case '/twitchhelp':
         chat.sendMessage(line.replace('twitchhelp', 'help'));
