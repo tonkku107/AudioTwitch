@@ -7,7 +7,6 @@ AudioTwitch includes
 * Configuration
 * Audio only stream
 * Volume switching
-* Track display for Monstercat FM
 
 (You can't see the emotes though, rip Kappa)
 
@@ -23,5 +22,4 @@ AudioTwitch has a few commands:
 3. Get node-gyp's requirements (You can find them from [here](https://github.com/nodejs/node-gyp/blob/master/README.md#installation))
 4. Download and install [FFmpeg](https://ffmpeg.org/) (You can place the binary in the same folder as the program)
 5. Run `npm install` to install all the required modules
-6. Edit config.js
-7. Run `node stream` or double-click the `stream.bat`
+6. Run `node index` or double-click the `stream.bat`

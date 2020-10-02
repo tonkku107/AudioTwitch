@@ -1,2 +1,2 @@
 @echo off
-node stream.js
+node index.js
