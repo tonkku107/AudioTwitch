@@ -194,12 +194,40 @@ class Player {
     const atBody = await atRes.json();
     const token = atBody.token;
     const sig = atBody.sig;
-    const channelID = JSON.parse(token).channel_id;
 
-    const streamRes = await fetch(`https://api.twitch.tv/kraken/streams/${channelID}?stream_type=all`, { headers });
+    const streamRes = await fetch(`https://gql.twitch.tv/gql`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: JSON.stringify([{
+        operationName: 'StreamMetadata',
+        variables: { channelLogin: this.channel },
+        extensions: {
+          persistedQuery: {
+            version: 1,
+            sha256Hash: '1c719a40e481453e5c48d9bb585d971b8b372f8ebb105b17076722264dfa5b3e',
+          },
+        },
+      }, {
+        operationName: 'ComscoreStreamingQuery',
+        variables: {
+          channel: this.channel,
+          clipSlug: '',
+          isClip: false,
+          isLive: true,
+          isVodOrCollection: false,
+          vodID: '',
+        },
+        extensions: {
+          persistedQuery: {
+            version: 1,
+            sha256Hash: 'e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01',
+          },
+        },
+      }]),
+    });
     const streamBody = await streamRes.json();
-    if (!streamBody.stream) throw new OfflineError(this.channel);
-    this.setTitle(streamBody.stream.channel.status);
+    if (!streamBody[0].data.user.stream) throw new OfflineError(this.channel);
+    this.setTitle(streamBody[1].data.user.broadcastSettings.title);
 
     const query = {
       allow_source: true,
