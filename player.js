@@ -8,7 +8,7 @@ const m3u8 = require('m3u8');
 const Speaker = require('speaker');
 
 const headers = {
-  Accept: 'application/vnd.twitchtv.v5+json; charset=UTF-8',
+  Accept: 'text/plain;charset=UTF-8',
   'Client-ID': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
 };
 
@@ -190,14 +190,9 @@ class Player {
   }
 
   _getHLSStreamURLs = async () => {
-    const atRes = await fetch(`https://api.twitch.tv/api/channels/${this.channel}/access_token`, { headers });
-    const atBody = await atRes.json();
-    const token = atBody.token;
-    const sig = atBody.sig;
-
-    const streamRes = await fetch(`https://gql.twitch.tv/gql`, {
+    const gqlRes = await fetch(`https://gql.twitch.tv/gql`, {
       method: 'POST',
-      headers: { ...headers, 'Content-Type': 'text/plain;charset=UTF-8' },
+      headers,
       body: JSON.stringify([{
         operationName: 'StreamMetadata',
         variables: { channelLogin: this.channel },
@@ -223,11 +218,14 @@ class Player {
             sha256Hash: 'e1edae8122517d013405f237ffcc124515dc6ded82480a88daef69c83b53ac01',
           },
         },
+      }, {
+        query: `{streamPlaybackAccessToken(channelName: "${this.channel}", params: {platform: "web", playerBackend: "mediaplayer", playerType: "site"}) {value, signature}}`
       }]),
     });
-    const streamBody = await streamRes.json();
-    if (!streamBody[0].data.user.stream) throw new OfflineError(this.channel);
-    this.setTitle(streamBody[1].data.user.broadcastSettings.title);
+    const gqlBody = await gqlRes.json();
+    const [metadata, comscore, accessToken] = gqlBody;
+    if (!metadata.data.user.stream) throw new OfflineError(this.channel);
+    this.setTitle(comscore.data.user.broadcastSettings.title);
 
     const query = {
       allow_source: true,
@@ -237,8 +235,8 @@ class Player {
       player: 'twitchweb',
       playlist_include_framerate: true,
       segment_preference: 4,
-      sig,
-      token,
+      sig: accessToken.data.streamPlaybackAccessToken.signature,
+      token: accessToken.data.streamPlaybackAccessToken.value,
     };
     const hlsRes = await fetch(`https://usher.ttvnw.net/api/channel/hls/${this.channel}.m3u8?${qs.stringify(query)}`, { headers });
     this.formats = await this._getFormats(hlsRes.body);
