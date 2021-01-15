@@ -8,7 +8,7 @@ const m3u8 = require('m3u8');
 const Speaker = require('speaker');
 
 const headers = {
-  Accept: 'text/plain;charset=UTF-8',
+  'Content-Type': 'text/plain;charset=UTF-8',
   'Client-ID': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
 };
 
