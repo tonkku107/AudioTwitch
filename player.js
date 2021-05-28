@@ -224,7 +224,7 @@ class Player {
     });
     const gqlBody = await gqlRes.json();
     const [metadata, comscore, accessToken] = gqlBody;
-    if (!metadata.data.user.stream) throw new OfflineError(this.channel);
+    if (!metadata.data.user?.stream) throw new OfflineError(this.channel);
     this.setTitle(comscore.data.user.broadcastSettings.title);
 
     const query = {
