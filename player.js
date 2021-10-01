@@ -1,6 +1,5 @@
 const console = require('./console');
 const fetch = require('node-fetch');
-const qs = require('querystring');
 const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
@@ -105,7 +104,7 @@ class Player {
       this.player.stdout.on('data', this._handleStream);
 
       this.player.stdout.once('close', async () => {
-        console.log('Player', 'stopped receiving audio');
+        console.log('Player', 'Stopped receiving audio');
         if (!this.stopping) {
           await this.stop();
           this.play();
@@ -227,7 +226,8 @@ class Player {
     if (!metadata.data.user?.stream) throw new OfflineError(this.channel);
     this.setTitle(comscore.data.user.broadcastSettings.title);
 
-    const query = {
+    const hlsUrl = new URL(`https://usher.ttvnw.net/api/channel/hls/${this.channel}.m3u8`);
+    hlsUrl.search = new URLSearchParams({
       allow_source: true,
       allow_audio_only: true,
       allow_spectre: true,
@@ -237,8 +237,8 @@ class Player {
       segment_preference: 4,
       sig: accessToken.data.streamPlaybackAccessToken.signature,
       token: accessToken.data.streamPlaybackAccessToken.value,
-    };
-    const hlsRes = await fetch(`https://usher.ttvnw.net/api/channel/hls/${this.channel}.m3u8?${qs.stringify(query)}`, { headers });
+    });
+    const hlsRes = await fetch(hlsUrl.toString(), { headers });
     this.formats = await this._getFormats(hlsRes.body);
   }
 
