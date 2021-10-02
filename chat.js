@@ -1,6 +1,6 @@
-const console = require('./console');
-const WebSocket = require('ws');
-const chalk = require('chalk');
+import console from './console.js';
+import WebSocket from 'ws';
+import chalk from 'chalk';
 
 const promiseEvent = (source, event) => new Promise(resolve => source.once(event, resolve));
 const ACTION = `${String.fromCharCode(1)}ACTION `;
@@ -95,7 +95,8 @@ class Chat {
     this.ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
   }
 
-  _onMessage = messages => {
+  _onMessage = (data, isBinary) => {
+    const messages = isBinary ? data : data.toString();
     for (let message of messages.split('\r\n')) {
       console.debug('chat', message);
       if (message.startsWith('PING')) {
@@ -236,6 +237,7 @@ class Chat {
   }
 
   _onClose = (code, reason) => {
+    reason = reason.toString();
     console.log('Chat', `Disconnected${this.disconnecting ? '' : ', Reconnecting in 5s...'}`);
     console.debug('chat', `Disconnect code: ${code}, reason: ${reason}`);
     this.connected = false;
@@ -247,4 +249,4 @@ class Chat {
   }
 }
 
-module.exports = Chat;
+export default Chat;

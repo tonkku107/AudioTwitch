@@ -1,7 +1,7 @@
-const console = require('./console');
-const config = require('./config');
-const Player = require('./player');
-const Chat = require('./chat');
+import console from './console.js';
+import config from './config.js';
+import Player from './player.js';
+import Chat from './chat.js';
 
 const player = new Player(config);
 const chat = new Chat(config);
@@ -114,7 +114,7 @@ console.rl.on('line', async line => {
         console.logMemoryUsage();
         break;
       case '/debug':
-        if (console.debugLevels.hasOwnProperty(command[1])) {
+        if (Object.prototype.hasOwnProperty.call(console.debugLevels, command[1])) {
           console.debugLevels[command[1]] = !console.debugLevels[command[1]];
           console.log('DEBUG', `Debug level ${command[1]} toggled.`);
         } else if (command[1] === 'all') {

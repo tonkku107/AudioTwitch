@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "A lightweight terminal twitch audio player",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,10 +18,14 @@
   },
   "homepage": "https://github.com/tonkku107/AudioTwitch#readme",
   "dependencies": {
-    "chalk": "^4.1.0",
-    "m3u8": "0.0.10",
-    "node-fetch": "^2.6.1",
-    "speaker": "^0.5.2",
-    "ws": "^7.4.6"
+    "chalk": "^4.1.2",
+    "m3u8": "^0.0.10",
+    "node-fetch": "^3.0.0",
+    "speaker": "^0.5.3",
+    "ws": "^8.2.2"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.15.7",
+    "eslint": "^7.32.0"
   }
 }
