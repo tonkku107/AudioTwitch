@@ -1,5 +1,5 @@
-const fs = require('fs');
-const console = require('./console');
+import fs from 'fs';
+import console from './console.js';
 
 // Default config
 const config = {
@@ -35,4 +35,4 @@ const proxy = new Proxy(config, {
   },
 });
 
-module.exports = proxy;
+export default proxy;

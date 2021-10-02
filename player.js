@@ -1,10 +1,10 @@
-const console = require('./console');
-const fetch = require('node-fetch');
-const fs = require('fs');
-const path = require('path');
-const { spawn } = require('child_process');
-const m3u8 = require('m3u8');
-const Speaker = require('speaker');
+import console from './console.js';
+import fetch from 'node-fetch';
+import fs from 'fs';
+import path from 'path';
+import { spawn } from 'child_process';
+import m3u8 from 'm3u8';
+import Speaker from 'speaker';
 
 const headers = {
   'Content-Type': 'text/plain;charset=UTF-8',
@@ -218,7 +218,7 @@ class Player {
           },
         },
       }, {
-        query: `{streamPlaybackAccessToken(channelName: "${this.channel}", params: {platform: "web", playerBackend: "mediaplayer", playerType: "site"}) {value, signature}}`
+        query: `{streamPlaybackAccessToken(channelName: "${this.channel}", params: {platform: "web", playerBackend: "mediaplayer", playerType: "site"}) {value, signature}}`,
       }]),
     });
     const gqlBody = await gqlRes.json();
@@ -228,6 +228,7 @@ class Player {
 
     const hlsUrl = new URL(`https://usher.ttvnw.net/api/channel/hls/${this.channel}.m3u8`);
     hlsUrl.search = new URLSearchParams({
+      /* eslint-disable camelcase */
       allow_source: true,
       allow_audio_only: true,
       allow_spectre: true,
@@ -237,6 +238,7 @@ class Player {
       segment_preference: 4,
       sig: accessToken.data.streamPlaybackAccessToken.signature,
       token: accessToken.data.streamPlaybackAccessToken.value,
+      /* eslint-enable camelcase */
     });
     const hlsRes = await fetch(hlsUrl.toString(), { headers });
     this.formats = await this._getFormats(hlsRes.body);
@@ -318,4 +320,4 @@ class Player {
   }
 }
 
-module.exports = Player;
+export default Player;
