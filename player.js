@@ -49,7 +49,7 @@ class Player {
     this.volume = this.config.volume;
 
     this.url = null;
-    this.formats = [];
+    this.formats = new Map();
 
     this._init();
   }
@@ -79,9 +79,7 @@ class Player {
         sampleRate: 48000,
       });
 
-      this.speaker.on('error', err => {
-        console.log('Player', `Speaker Error: ${err}`);
-      });
+      this.speaker.on('error', this._speakerError);
 
       this.player = createProcess('ffmpeg', [
         '-re',
@@ -93,23 +91,13 @@ class Player {
         'pipe:1',
       ], { stdio: ['pipe', 'pipe', 'ignore'] });
 
-      this.player.stdout.once('readable', () => {
-        console.log('Player', 'Started receiving audio');
-      });
+      this.player.stdout.once('readable', this._ffmpegReadable);
 
-      this.player.stdout.on('error', err => {
-        console.log('Player', `Error: ${err}`);
-      });
+      this.player.stdout.on('error', this._ffmpegError);
 
       this.player.stdout.on('data', this._handleStream);
 
-      this.player.stdout.once('close', async () => {
-        console.log('Player', 'Stopped receiving audio');
-        if (!this.stopping) {
-          await this.stop();
-          this.play();
-        }
-      });
+      this.player.stdout.once('close', this._ffmpegClose);
     } else {
       this.video = true;
 
@@ -122,9 +110,7 @@ class Player {
       console.log('Player', 'Player started on external window. See https://ffmpeg.org/ffplay.html#While-playing for controls.');
     }
 
-    this.player.once('exit', () => {
-      this.dead = true;
-    });
+    this.player.once('exit', this._ffmpegExit);
   }
 
   stop = async () => {
@@ -160,6 +146,30 @@ class Player {
     }
     this.format = format;
     this.url = this.formats.get(format);
+  }
+
+  _speakerError = err => {
+    console.log('Player', `Speaker Error: ${err}`);
+  }
+
+  _ffmpegError = err => {
+    console.log('Player', `Error: ${err}`);
+  }
+
+  _ffmpegReadable = () => {
+    console.log('Player', 'Started receiving audio');
+  }
+
+  _ffmpegClose = async () => {
+    console.log('Player', 'Stopped receiving audio');
+    if (!this.stopping) {
+      await this.stop();
+      this.play();
+    }
+  }
+
+  _ffmpegExit = () => {
+    this.dead = true;
   }
 
   _init = async () => {
@@ -255,9 +265,9 @@ class Player {
       formats.set(key === 'chunked' ? 'source' : key, item.get('uri'));
     });
 
-    parser.on('error', err => reject(err));
+    parser.once('error', err => reject(err));
 
-    parser.on('m3u', () => resolve(formats));
+    parser.once('m3u', () => resolve(formats));
   });
 
   _handleVolume = buffer => {
@@ -302,21 +312,23 @@ class Player {
       if (!good) {
         this.writing = false;
 
-        this.speaker.once('drain', () => {
-          this.writing = true;
-
-          if (this.bufPaused) {
-            this.player.kill('SIGCONT');
-            console.debug('player', 'Resuming ffmpeg');
-            this.bufPaused = false;
-          }
-
-          this.player.stdout.emit('data');
-        });
+        this.speaker.once('drain', this._speakerDrain);
       }
     } else if (this.writing) {
       this.buffering = true;
     }
+  }
+
+  _speakerDrain = () => {
+    this.writing = true;
+
+    if (this.bufPaused) {
+      this.player.kill('SIGCONT');
+      console.debug('player', 'Resuming ffmpeg');
+      this.bufPaused = false;
+    }
+
+    this.player.stdout.emit('data');
   }
 }
 

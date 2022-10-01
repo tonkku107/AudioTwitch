@@ -1,4 +1,5 @@
 import readline from 'readline';
+import v8 from 'v8';
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -32,7 +33,7 @@ console.debug = (level, ...args) => {
 
 console.logMemoryUsage = debugLevel => {
   const mem = process.memoryUsage();
-  const message = `Heap: ${(mem.heapUsed / 1000000).toFixed(2)}MB / ${(mem.heapTotal / 1000000).toFixed(2)}MB, RSS: ${(mem.rss / 1000000).toFixed(2)}MB, External: ${(mem.external / 1000000).toFixed(2)}MB, ArrayBuffers: ${(mem.arrayBuffers / 1000000).toFixed(2)}MB`;
+  const message = `Heap: ${(mem.heapUsed / 1000000).toFixed(2)}MB / ${(mem.heapTotal / 1000000).toFixed(2)}MB (${(v8.getHeapStatistics().heap_size_limit / 1000000).toFixed(2)}MB), RSS: ${(mem.rss / 1000000).toFixed(2)}MB, External: ${(mem.external / 1000000).toFixed(2)}MB, ArrayBuffers: ${(mem.arrayBuffers / 1000000).toFixed(2)}MB`;
   if (debugLevel) return console.debug(debugLevel, message);
   console.log(message);
 };
