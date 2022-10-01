@@ -113,6 +113,14 @@ console.rl.on('line', async line => {
       case '/mem':
         console.logMemoryUsage();
         break;
+      case '/gc':
+        if (global.gc) {
+          global.gc(command[1] === 'full');
+          console.log('gc', `Garbage${command[1] === 'full' ? ' fully' : ''} collected`);
+        } else {
+          console.log('gc', 'Use --expose-gc');
+        }
+        break;
       case '/debug':
         if (Object.prototype.hasOwnProperty.call(console.debugLevels, command[1])) {
           console.debugLevels[command[1]] = !console.debugLevels[command[1]];
