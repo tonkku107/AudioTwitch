@@ -152,7 +152,7 @@ class Chat {
               if (!duration) {
                 console.log('Chat/Notice', `${target} was banned permanently.`);
               } else {
-                console.log('Chat/Notice', `${target} was timed out for ${duration} seconds.`);
+                console.log('Chat/Notice', `${target} was timed out for ${Number(duration)} seconds.`);
               }
             }
             break;
