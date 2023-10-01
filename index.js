@@ -29,10 +29,6 @@ console.rl.on('line', async line => {
   if (line.startsWith('/')) {
     const command = line.split(' ');
     switch (command[0]) {
-      case '/whisper':
-      case '/w':
-        chat.sendWhisper(command[1], command.splice(2).join(' '));
-        break;
       case '/me':
         chat.sendMe(command.splice(1).join(' '));
         break;
@@ -139,40 +135,9 @@ console.rl.on('line', async line => {
           console.log('DEBUG', 'Invalid log level');
         }
         break;
-      case '/ban':
-      case '/unban':
-      case '/clear':
-      case '/color':
-      case '/commercial':
-      case '/delete':
-      case '/disconnect':
-      case '/emoteonly':
-      case '/emoteonlyoff':
-      case '/followers':
-      case '/followersoff':
-      case '/host':
-      case '/unhost':
-      case '/marker':
-      case '/mod':
-      case '/unmod':
-      case '/mods':
-      case '/r9kbeta':
-      case '/r9kbetaoff':
-      case '/raid':
-      case '/unraid':
-      case '/slow':
-      case '/slowoff':
-      case '/subscribers':
-      case '/subscribersoff':
-      case '/timeout':
-      case '/untimeout':
-      case '/vip':
-      case '/unvip':
-      case '/vips':
-        chat.sendMessage(line);
-        break;
       case '/help':
         console.log('INFO', `AudioTwitch has a few commands:
+* /me [message] - Sends a me message.
 * /kill, /quit or /stop - Stops the application.
 * /restart - Restarts the stream and chat if there was a problem for some reason.
 * /reset - Resets the player completely in case the stream url has changed.
@@ -181,11 +146,7 @@ console.rl.on('line', async line => {
 * /login, /logout - For logging in and out of twitch chat so you can talk.
 * /channel [channel] - Switch twitch channels.
 * /formats - Displays what formats are available.
-* /format [format] - Switches the stream to the selected format.
-* Twitch chat commands also work, check /twitchhelp`);
-        break;
-      case '/twitchhelp':
-        chat.sendMessage(line.replace('twitchhelp', 'help'));
+* /format [format] - Switches the stream to the selected format.`);
         break;
       default:
         console.log('INFO', 'Invalid command');
