@@ -68,18 +68,6 @@ class Chat {
     console.log(this._formatMe(user, message));
   }
 
-  sendWhisper = (recipient, message) => {
-    if (!this.connected) return;
-    if (!this.pass) return console.log('Chat', 'You are viewing chat anonymously and cannot send messages. Log in with /login');
-    this.ws.send(`PRIVMSG #${this.channel} :/w ${recipient} ${message}`);
-    console.clearInput();
-
-    const user = {
-      username: recipient,
-    };
-    console.log(this._formatWhisper(user, false, message));
-  }
-
   _login = () => {
     if (this.pass) {
       this.ws.send(`PASS ${this.pass}`);
