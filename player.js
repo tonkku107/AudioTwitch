@@ -13,6 +13,7 @@ const headers = {
 
 const UpperStreamBufferThreshold = 300; // Should be 96000 bytes per second. Data chunks seem to be usually ~4500 bytes each, sometimes higher. About 21 chunks per second.
 const LowerStreamBufferThreshold = 100;
+const FastDisconnectTimeout = 5000;
 
 const fileExists = filePath => {
   try {
@@ -164,7 +165,22 @@ class Player {
     console.log('Player', 'Stopped receiving audio');
     if (!this.stopping) {
       await this.stop();
-      this.play();
+
+      if (this.lastDisconnect > Date.now() - FastDisconnectTimeout) {
+        this.disconnects += 1;
+        console.debug('player', `Fast disconnect, total: ${this.disconnects}`);
+      } else {
+        this.disconnects = 1;
+        console.debug('player', `Slow disconnect`);
+      }
+      this.lastDisconnect = new Date();
+
+      if (this.disconnects > 10) {
+        console.log('Player', 'Fetching a new stream due to frequent disconnects');
+        this._init();
+      } else {
+        this.play();
+      }
     }
   }
 
@@ -174,6 +190,10 @@ class Player {
 
   _init = async () => {
     this._reset();
+
+    this.lastDisconnect = new Date();
+    this.disconnects = 0;
+
     try {
       await this._getHLSStreamURLs();
     } catch (e) {
@@ -228,11 +248,25 @@ class Player {
           },
         },
       }, {
-        query: `{streamPlaybackAccessToken(channelName: "${this.channel}", params: {platform: "web", playerBackend: "mediaplayer", playerType: "site"}) {value, signature}}`,
+        extensions: {
+          persistedQuery: {
+            version: 1,
+            sha256Hash: '0828119ded1c13477966434e15800ff57ddacf13ba1911c129dc2200705b0712',
+          },
+        },
+        operationName: 'PlaybackAccessToken',
+        variables: {
+          isLive: true,
+          login: this.channel,
+          isVod: false,
+          vodID: '',
+          playerType: 'site',
+        },
       }]),
     });
     const gqlBody = await gqlRes.json();
     const [metadata, comscore, accessToken] = gqlBody;
+    console.debug('player', accessToken);
     if (!metadata.data.user?.stream) throw new OfflineError(this.channel);
     this.setTitle(comscore.data.user.broadcastSettings.title);
 
@@ -250,7 +284,7 @@ class Player {
       token: accessToken.data.streamPlaybackAccessToken.value,
       /* eslint-enable camelcase */
     });
-    const hlsRes = await fetch(hlsUrl.toString(), { headers });
+    const hlsRes = await fetch(hlsUrl, { headers });
     this.formats = await this._getFormats(hlsRes.body);
   }
 
